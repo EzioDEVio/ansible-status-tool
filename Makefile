@@ -4,3 +4,4 @@ install:
 uninstall:
     rm /usr/local/bin/ansible-status
 
+
