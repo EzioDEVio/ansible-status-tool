@@ -56,7 +56,6 @@ control_logo=$(neofetch --stdout | grep -v 'OS:' | grep -v 'Host:' | grep -v 'Ke
 
 # Add color variables
 GREEN='\033[0;32m'
-BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Display control machine information
@@ -69,7 +68,7 @@ cat << "EOF"
 EOF
 
 echo -e "$control_logo"
-echo -e "${BLUE}Control Node: $control_hostname.localdomain${NC}\n----------------------------"
+echo -e "${GREEN}Control Node: $control_hostname.localdomain${NC}\n----------------------------"
 echo -e "${GREEN}OS:${NC} $control_os"
 echo -e "${GREEN}Host:${NC} $control_hostname"
 echo -e "${GREEN}Kernel:${NC} $control_kernel"
@@ -82,7 +81,7 @@ echo -e "${GREEN}Memory:${NC} $control_memory"
 echo -e "${GREEN}IP Address:${NC} $control_ip"
 
 echo
-echo -e "${BLUE}Managed Nodes:${NC}"
+echo -e "${GREEN}Managed Nodes:${NC}"
 
 # Get managed nodes information
 while IFS= read -r line; do
@@ -90,7 +89,7 @@ while IFS= read -r line; do
         node=$(echo $line | awk '{print $1}')
         details=$(get_node_details $node)
 
-        echo -e "${BLUE}Node: $node${NC}\n----------------------------"
+        echo -e "${GREEN}Node: $node${NC}\n----------------------------"
         echo -e "$details"
     fi
 done < "$inventory_file"
