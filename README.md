@@ -24,7 +24,14 @@ ansible-status-tool/
    cd ansible-status-tool
    ```
 
-2. Make the script executable:
+2. install makefile
+
+   ```
+   sudo make install
+
+   ```
+
+3. You may need to kake the script executable(optional):
 
    ```
    chmod +x ansible_status.sh
