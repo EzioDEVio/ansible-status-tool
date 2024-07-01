@@ -18,17 +18,17 @@ get_node_details() {
     ip=$(ansible -i $inventory_file -m setup -a 'filter=ansible_default_ipv4.address' $node | grep ansible_default_ipv4.address)
 
     details+="$logo\n"
-    details+="OS: $(echo $os | awk -F": " '{print $2}' | xargs)\n"
-    details+="Host: $(echo $host | awk -F": " '{print $2}' | xargs)\n"
-    details+="Kernel: $(echo $kernel | awk -F": " '{print $2}' | xargs)\n"
-    details+="Uptime: $(echo $uptime | awk -F": " '{print $2}' | xargs)\n"
-    details+="Packages: $(echo $packages | awk -F": " '{print $2}' | xargs)\n"
-    details+="Shell: $(echo $shell | awk -F": " '{print $2}' | xargs)\n"
-    details+="Resolution: preferred\n"
-    details+="Terminal: $(echo $term | awk -F": " '{print $2}' | xargs)\n"
-    details+="CPU: $(echo $cpu | awk -F": " '{print $2}' | xargs)\n"
-    details+="Memory: $(echo $memory | xargs)\n"
-    details+="IP Address: $(echo $ip | awk -F": " '{print $2}' | xargs)\n"
+    details+="${GREEN}OS:${NC} $(echo $os | awk -F": " '{print $2}' | xargs)\n"
+    details+="${GREEN}Host:${NC} $(echo $host | awk -F": " '{print $2}' | xargs)\n"
+    details+="${GREEN}Kernel:${NC} $(echo $kernel | awk -F": " '{print $2}' | xargs)\n"
+    details+="${GREEN}Uptime:${NC} $(echo $uptime | awk -F": " '{print $2}' | xargs)\n"
+    details+="${GREEN}Packages:${NC} $(echo $packages | awk -F": " '{print $2}' | xargs)\n"
+    details+="${GREEN}Shell:${NC} $(echo $shell | awk -F": " '{print $2}' | xargs)\n"
+    details+="${GREEN}Resolution:${NC} preferred\n"
+    details+="${GREEN}Terminal:${NC} $(echo $term | awk -F": " '{print $2}' | xargs)\n"
+    details+="${GREEN}CPU:${NC} $(echo $cpu | awk -F": " '{print $2}' | xargs)\n"
+    details+="${GREEN}Memory:${NC} $(echo $memory | xargs)\n"
+    details+="${GREEN}IP Address:${NC} $(echo $ip | awk -F": " '{print $2}' | xargs)\n"
 
     echo -e "$details"
 }
