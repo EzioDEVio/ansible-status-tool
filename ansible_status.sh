@@ -5,17 +5,17 @@ get_node_details() {
     local node=$1
     local details=""
     
-    logo=$(ansible -i $inventory_file -m shell -a 'neofetch --stdout' $node)
+    logo=$(ansible -i $inventory_file -m shell -a 'neofetch --stdout' $node 2>/dev/null)
     os=$(echo "$logo" | grep 'OS:')
-    host=$(ansible -i $inventory_file -m setup -a 'filter=ansible_hostname' $node | grep ansible_hostname)
+    host=$(echo "$logo" | grep 'Host:')
     kernel=$(echo "$logo" | grep 'Kernel:')
     uptime=$(echo "$logo" | grep 'Uptime:')
     packages=$(echo "$logo" | grep 'Packages:')
     shell=$(echo "$logo" | grep 'Shell:')
-    term=$(ansible -i $inventory_file -m setup -a 'filter=ansible_env.TERM' $node | grep ansible_env.TERM)
+    term=$(echo "$logo" | grep 'Terminal:')
     cpu=$(echo "$logo" | grep 'CPU:')
     memory=$(echo "$logo" | grep 'Memory:')
-    ip=$(ansible -i $inventory_file -m setup -a 'filter=ansible_default_ipv4.address' $node | grep ansible_default_ipv4.address)
+    ip=$(ansible -i $inventory_file -m setup -a 'filter=ansible_default_ipv4.address' $node 2>/dev/null | grep ansible_default_ipv4.address)
 
     details+="$logo\n"
     details+="${GREEN}OS:${NC} $(echo $os | awk -F": " '{print $2}' | xargs)\n"
