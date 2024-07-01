@@ -1,54 +1,53 @@
 #!/bin/bash
 
-# Colors for output
-GREEN="\033[0;32m"
-CYAN="\033[0;36m"
-RED="\033[0;31m"
-NC="\033[0m" # No Color
-
-# Function to get control machine information
-get_control_machine_info() {
-    echo -e "${CYAN}Control Machine:${NC}"
-    echo -e "${GREEN}Hostname:${NC} $(hostname)"
-    echo -e "${GREEN}IP Address:${NC} $(hostname -I | awk '{print $1}')"
-    echo -e "${GREEN}OS:${NC} $(lsb_release -d | awk -F"\t" '{print $2}')"
-    echo -e "${GREEN}Kernel:${NC} $(uname -r)"
+# Function to print ASCII art logo
+print_logo() {
+    echo "      _    _               _        "
+    echo "     / \  | |__   ___  ___| |_ __ _ "
+    echo "    / _ \ | '_ \ / _ \/ __| __/ _\` |"
+    echo "   / ___ \| | | |  __/ (__| || (_| |"
+    echo "  /_/   \_\_| |_|\___|\___|\__\__,_|"
     echo
 }
 
-# Function to get managed nodes from inventory file
-get_managed_nodes() {
-    echo -e "${CYAN}Managed Nodes:${NC}"
-    inventory_file="$1"
+# Function to extract control machine details
+get_control_machine_details() {
+    echo "Control Machine:"
+    echo "Hostname: $(hostname)"
+    echo "IP Address: $(hostname -I | awk '{print $1}')"
+    echo "OS: $(lsb_release -ds)"
+    echo "Kernel: $(uname -r)"
+    echo
+}
 
-    if [ ! -f "$inventory_file" ]; then
-        echo -e "${RED}Inventory file not found: $inventory_file${NC}"
-        exit 1
-    fi
-
-    managed_nodes=$(grep -E '^[^\[#]' "$inventory_file" | awk '{print $1}')
-
-    for node in $managed_nodes; do
-        echo -e "${GREEN}Node:${NC} $node"
-        ip=$(getent hosts "$node" | awk '{ print $1 }')
-        echo -e "${GREEN}IP Address:${NC} $ip"
-        echo -e "${GREEN}Status:${NC} $(ansible -m ping -i "$inventory_file" "$node" | grep -oP 'SUCCESS|UNREACHABLE')"
-        echo
+# Function to extract managed nodes details
+get_managed_nodes_details() {
+    local inventory_file=$1
+    echo "Managed Nodes:"
+    grep -vE '^\s*$|^\s*#' "$inventory_file" | while IFS= read -r node; do
+        if [[ -n $node ]]; then
+            echo "Node: $node"
+            ansible -m ping -i "$inventory_file" "$node" > /dev/null 2>&1
+            if [[ $? -eq 0 ]]; then
+                echo "IP Address: $node"
+                echo "Status: SUCCESS"
+            else
+                echo "IP Address: $node"
+                echo "Status: FAILED"
+            fi
+            echo
+        fi
     done
 }
 
-# Main function to display all info
-display_info() {
-    inventory_file="$1"
-    get_control_machine_info
-    get_managed_nodes "$inventory_file"
-}
-
-# Check if inventory file is passed as argument
-if [ -z "$1" ]; then
-    echo -e "${RED}Usage: $0 <inventory_file>${NC}"
+# Main script
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 <inventory_file>"
     exit 1
 fi
 
-# Run the main function
-display_info "$1"
+inventory_file=$1
+
+print_logo
+get_control_machine_details
+get_managed_nodes_details "$inventory_file"
