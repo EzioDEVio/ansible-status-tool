@@ -46,17 +46,16 @@ echo
 echo -e "${GREEN}Managed Nodes:${NC}"
 
 # Extract nodes from inventory file
-NODES=$(grep -vE '^\[|^$' "$INVENTORY_FILE")
+NODES=$(grep -vE '^\[|^$' "$INVENTORY_FILE" | grep -oE '^[^ ]+')
 
 for NODE in $NODES; do
-  NODE_NAME=$(echo $NODE | cut -d' ' -f1)
-  NODE_IP=$(echo $NODE | grep -oP '(?<=ansible_host=)[^\s]+')
-
-  echo -e "${CYAN}Node:${NC} $NODE_NAME"
+  NODE_IP=$(grep "$NODE" "$INVENTORY_FILE" | grep -oP '(?<=ansible_host=)[^\s]+')
+  
+  echo -e "${CYAN}Node:${NC} $NODE"
   echo -e "${CYAN}IP Address:${NC} $NODE_IP"
 
   # Check node status using Ansible ping module
-  ansible -i "$INVENTORY_FILE" -m ping "$NODE_NAME" >/dev/null 2>&1
+  ansible -i "$INVENTORY_FILE" -m ping "$NODE" >/dev/null 2>&1
   if [ $? -eq 0 ]; then
     echo -e "${CYAN}Status:${NC} ${GREEN}SUCCESS${NC}"
   else
