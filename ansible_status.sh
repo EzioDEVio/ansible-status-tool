@@ -4,28 +4,30 @@
 get_node_details() {
     local node=$1
     local details=""
-
-    os=$(ansible -i $inventory_file -m setup -a 'filter=ansible_distribution*' $node | grep ansible_distribution)
+    
+    logo=$(ansible -i $inventory_file -m shell -a 'neofetch --stdout' $node)
+    os=$(echo "$logo" | grep 'OS:')
     host=$(ansible -i $inventory_file -m setup -a 'filter=ansible_hostname' $node | grep ansible_hostname)
-    kernel=$(ansible -i $inventory_file -m setup -a 'filter=ansible_kernel' $node | grep ansible_kernel)
-    uptime=$(ansible -i $inventory_file -m command -a 'uptime -p' $node | grep uptime)
-    packages=$(ansible -i $inventory_file -m command -a 'rpm -qa | wc -l' $node | grep stdout)
-    shell=$(ansible -i $inventory_file -m setup -a 'filter=ansible_env.SHELL' $node | grep ansible_env.SHELL)
+    kernel=$(echo "$logo" | grep 'Kernel:')
+    uptime=$(echo "$logo" | grep 'Uptime:')
+    packages=$(echo "$logo" | grep 'Packages:')
+    shell=$(echo "$logo" | grep 'Shell:')
     term=$(ansible -i $inventory_file -m setup -a 'filter=ansible_env.TERM' $node | grep ansible_env.TERM)
-    cpu=$(ansible -i $inventory_file -m setup -a 'filter=ansible_processor' $node | grep -A 1 ansible_processor)
-    memory=$(ansible -i $inventory_file -m setup -a 'filter=ansible_memory_mb' $node | grep ansible_memory_mb.real)
+    cpu=$(echo "$logo" | grep 'CPU:')
+    memory=$(echo "$logo" | grep 'Memory:')
     ip=$(ansible -i $inventory_file -m setup -a 'filter=ansible_default_ipv4.address' $node | grep ansible_default_ipv4.address)
 
+    details+="$logo\n"
     details+="OS: $(echo $os | awk -F": " '{print $2}' | xargs)\n"
     details+="Host: $(echo $host | awk -F": " '{print $2}' | xargs)\n"
     details+="Kernel: $(echo $kernel | awk -F": " '{print $2}' | xargs)\n"
     details+="Uptime: $(echo $uptime | awk -F": " '{print $2}' | xargs)\n"
-    details+="Packages: $(echo $packages | awk -F": " '{print $2}' | xargs) (rpm)\n"
+    details+="Packages: $(echo $packages | awk -F": " '{print $2}' | xargs)\n"
     details+="Shell: $(echo $shell | awk -F": " '{print $2}' | xargs)\n"
     details+="Resolution: preferred\n"
     details+="Terminal: $(echo $term | awk -F": " '{print $2}' | xargs)\n"
     details+="CPU: $(echo $cpu | awk -F": " '{print $2}' | xargs)\n"
-    details+="Memory: $(echo $memory | awk '{print $2"MiB / "$4"MiB"}')\n"
+    details+="Memory: $(echo $memory | xargs)\n"
     details+="IP Address: $(echo $ip | awk -F": " '{print $2}' | xargs)\n"
 
     echo -e "$details"
@@ -50,6 +52,7 @@ control_shell=$SHELL
 control_terminal=$TERM
 control_cpu=$(lscpu | grep 'Model name' | awk -F: '{print $2}' | xargs)
 control_memory=$(free -m | awk 'NR==2{printf "%sMiB / %sMiB\n", $3,$2 }')
+control_logo=$(neofetch --stdout | grep -v 'OS:' | grep -v 'Host:' | grep -v 'Kernel:' | grep -v 'Uptime:' | grep -v 'Packages:' | grep -v 'Shell:' | grep -v 'Resolution:' | grep -v 'Terminal:' | grep -v 'CPU:' | grep -v 'Memory:' | grep -v 'GPU:')
 
 # Add color variables
 GREEN='\033[0;32m'
@@ -65,6 +68,7 @@ cat << "EOF"
  |_____|/___||_| \___/ |____/  \___|  \_/  |_| \___/ 
 EOF
 
+echo -e "$control_logo"
 echo -e "${BLUE}Control Node: $control_hostname.localdomain${NC}\n----------------------------"
 echo -e "${GREEN}OS:${NC} $control_os"
 echo -e "${GREEN}Host:${NC} $control_hostname"
