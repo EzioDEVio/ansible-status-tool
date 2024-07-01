@@ -24,7 +24,7 @@ ansible-status-tool/
    cd ansible-status-tool
    ```
 
-2. install makefile
+2. Use the Makefile to install the script:
 
    ```
    sudo make install
@@ -37,6 +37,13 @@ ansible-status-tool/
    chmod +x ansible_status.sh
    ```
 
+## Uninstallation
+To uninstall the script, use:
+```
+sudo make uninstall
+
+```
+
 ## Usage
 
 Run the script with your inventory file as an argument:
@@ -47,20 +54,41 @@ Run the script with your inventory file as an argument:
 
 # Example Output
 ```
-Control Machine:
-Hostname: control-machine
-IP Address: 192.168.1.1
-OS: Ubuntu 20.04.1 LTS
-Kernel: 5.4.0-54-generic
+  _____       _         ____                _        
+ | ____| ____(_)  ___  |  _ \   ___ __   __(_)  ___  
+ |  _|  |_  /| | / _ \ | | | | / _ \ \ / /| | / _ \ 
+ | |___  / / | || (_) || |_| ||  __/ \ V / | || (_) |
+ |_____|/___||_| \___/ |____/  \___|  \_/  |_| \___/ 
+
+Control Node: control-machine.localdomain
+----------------------------
+OS: Ubuntu 22.04.3 LTS
+Host: control-machine
+Kernel: 5.15.153.1-microsoft-standard-WSL2
+Uptime: 4 hours, 35 mins
+Packages: 1497
+Shell: /bin/bash
+Resolution: 1920x1080
+Terminal: xterm-256color
+CPU: 12th Gen Intel i5-12450H (4) @ 2.495GHz
+Memory: 1172MiB / 2849MiB
+IP Address: 192.168.122.1
 
 Managed Nodes:
-Node: node1
-IP Address: 192.168.1.2
-Status: SUCCESS
+Node: 192.168.254.174
+----------------------------
+OS: CentOS Linux 7 (Core) x86_64
+Host: oracle
+Kernel: 3.10.0-1160.el7.x86_64
+Uptime: 4 hours, 35 mins
+Packages: 1497 (rpm)
+Shell: /bin/bash
+Resolution: preferred
+Terminal: /dev/pts/0
+CPU: Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz
+Memory: 1172MiB / 2849MiB
+IP Address: 192.168.254.174
 
-Node: node2
-IP Address: 192.168.1.3
-Status: UNREACHABLE
 
 ```
 # Contributing
