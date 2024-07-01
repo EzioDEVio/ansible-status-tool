@@ -5,17 +5,28 @@ get_node_details() {
     local node=$1
     local details=""
 
-    details+="OS: $(ansible -i $inventory_file -m setup -a 'filter=ansible_distribution*' $node | grep ansible_distribution | awk -F": " '{print $2}' | xargs)\n"
-    details+="Host: $(ansible -i $inventory_file -m setup -a 'filter=ansible_hostname' $node | grep ansible_hostname | awk -F": " '{print $2}' | xargs)\n"
-    details+="Kernel: $(ansible -i $inventory_file -m setup -a 'filter=ansible_kernel' $node | grep ansible_kernel | awk -F": " '{print $2}' | xargs)\n"
-    details+="Uptime: $(ansible -i $inventory_file -m command -a 'uptime -p' $node | grep uptime | awk -F": " '{print $2}' | xargs)\n"
-    details+="Packages: $(ansible -i $inventory_file -m command -a 'rpm -qa | wc -l' $node | grep stdout | awk -F": " '{print $2}' | xargs) (rpm)\n"
-    details+="Shell: $(ansible -i $inventory_file -m setup -a 'filter=ansible_env.SHELL' $node | grep ansible_env.SHELL | awk -F": " '{print $2}' | xargs)\n"
+    os=$(ansible -i $inventory_file -m setup -a 'filter=ansible_distribution*' $node | grep ansible_distribution)
+    host=$(ansible -i $inventory_file -m setup -a 'filter=ansible_hostname' $node | grep ansible_hostname)
+    kernel=$(ansible -i $inventory_file -m setup -a 'filter=ansible_kernel' $node | grep ansible_kernel)
+    uptime=$(ansible -i $inventory_file -m command -a 'uptime -p' $node | grep uptime)
+    packages=$(ansible -i $inventory_file -m command -a 'rpm -qa | wc -l' $node | grep stdout)
+    shell=$(ansible -i $inventory_file -m setup -a 'filter=ansible_env.SHELL' $node | grep ansible_env.SHELL)
+    term=$(ansible -i $inventory_file -m setup -a 'filter=ansible_env.TERM' $node | grep ansible_env.TERM)
+    cpu=$(ansible -i $inventory_file -m setup -a 'filter=ansible_processor' $node | grep -A 1 ansible_processor)
+    memory=$(ansible -i $inventory_file -m setup -a 'filter=ansible_memory_mb' $node | grep ansible_memory_mb.real)
+    ip=$(ansible -i $inventory_file -m setup -a 'filter=ansible_default_ipv4.address' $node | grep ansible_default_ipv4.address)
+
+    details+="OS: $(echo $os | awk -F": " '{print $2}' | xargs)\n"
+    details+="Host: $(echo $host | awk -F": " '{print $2}' | xargs)\n"
+    details+="Kernel: $(echo $kernel | awk -F": " '{print $2}' | xargs)\n"
+    details+="Uptime: $(echo $uptime | awk -F": " '{print $2}' | xargs)\n"
+    details+="Packages: $(echo $packages | awk -F": " '{print $2}' | xargs) (rpm)\n"
+    details+="Shell: $(echo $shell | awk -F": " '{print $2}' | xargs)\n"
     details+="Resolution: preferred\n"
-    details+="Terminal: $(ansible -i $inventory_file -m setup -a 'filter=ansible_env.TERM' $node | grep ansible_env.TERM | awk -F": " '{print $2}' | xargs)\n"
-    details+="CPU: $(ansible -i $inventory_file -m setup -a 'filter=ansible_processor' $node | grep ansible_processor | grep -v ansible_processor_vcpus | grep -v ansible_processor_cores | awk -F": " '{print $2}' | xargs)\n"
-    details+="Memory: $(ansible -i $inventory_file -m setup -a 'filter=ansible_memory_mb' $node | grep ansible_memory_mb.real | awk '{print $2"MiB / "$4"MiB"}')\n"
-    details+="IP Address: $(ansible -i $inventory_file -m setup -a 'filter=ansible_default_ipv4.address' $node | grep ansible_default_ipv4.address | awk -F": " '{print $2}' | xargs)\n"
+    details+="Terminal: $(echo $term | awk -F": " '{print $2}' | xargs)\n"
+    details+="CPU: $(echo $cpu | awk -F": " '{print $2}' | xargs)\n"
+    details+="Memory: $(echo $memory | awk '{print $2"MiB / "$4"MiB"}')\n"
+    details+="IP Address: $(echo $ip | awk -F": " '{print $2}' | xargs)\n"
 
     echo -e "$details"
 }
