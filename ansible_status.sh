@@ -14,6 +14,7 @@ get_node_details() {
     details+="Terminal: $(ansible -i $inventory_file -m setup -a 'filter=ansible_env.TERM' $node | grep ansible_env.TERM | awk -F": " '{print $2}' | xargs)\n"
     details+="CPU: $(ansible -i $inventory_file -m setup -a 'filter=ansible_processor' $node | grep ansible_processor | grep -v ansible_processor_vcpus | grep -v ansible_processor_cores | awk -F": " '{print $2}' | xargs)\n"
     details+="Memory: $(ansible -i $inventory_file -m setup -a 'filter=ansible_memory_mb' $node | grep ansible_memory_mb.real | awk '{print $2"MiB / "$4"MiB"}')\n"
+    details+="IP Address: $(ansible -i $inventory_file -m setup -a 'filter=ansible_default_ipv4.address' $node | grep ansible_default_ipv4.address | awk -F": " '{print $2}' | xargs)\n"
     echo -e $details
 }
 
@@ -57,12 +58,13 @@ echo -e "${GREEN}OS:${NC} $control_os"
 echo -e "${GREEN}Host:${NC} $control_hostname"
 echo -e "${GREEN}Kernel:${NC} $control_kernel"
 echo -e "${GREEN}Uptime:${NC} $control_uptime"
-echo -e "${GREEN}Packages:${NC} $control_packages (rpm)"
+echo -e "${GREEN}Packages:${NC} $control_packages"
 echo -e "${GREEN}Shell:${NC} $control_shell"
 echo -e "${GREEN}Resolution:${NC} $control_resolution"
 echo -e "${GREEN}Terminal:${NC} $control_terminal"
 echo -e "${GREEN}CPU:${NC} $control_cpu"
 echo -e "${GREEN}Memory:${NC} $control_memory"
+echo -e "${GREEN}IP Address:${NC} $control_ip"
 
 echo
 echo -e "${BLUE}Managed Nodes:${NC}"
@@ -71,7 +73,6 @@ echo -e "${BLUE}Managed Nodes:${NC}"
 while IFS= read -r line; do
     if [[ $line == *"ansible_user"* ]]; then
         node=$(echo $line | awk '{print $1}')
-        ip=$(echo $line | awk '{print $1}')
         details=$(get_node_details $node)
 
         echo -e "${BLUE}Node: $node${NC}\n----------------------------"
