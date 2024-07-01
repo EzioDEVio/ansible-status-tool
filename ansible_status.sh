@@ -58,6 +58,10 @@ for NODE in $NODES; do
   ansible -i "$INVENTORY_FILE" -m ping "$NODE" >/dev/null 2>&1
   if [ $? -eq 0 ]; then
     echo -e "${CYAN}Status:${NC} ${GREEN}SUCCESS${NC}"
+    # Gather OS info
+    OS_INFO=$(ansible -i "$INVENTORY_FILE" -m shell -a "cat /etc/os-release" "$NODE" 2>/dev/null | grep -E "^PRETTY_NAME=" | cut -d= -f2 | tr -d '"')
+    KERNEL_INFO=$(ansible -i "$INVENTORY_FILE" -m shell -a "uname -r" "$NODE" 2>/dev/null | grep -E "^\d")
+    echo -e "${CYAN}OS:${NC} $OS_INFO, Kernel: $KERNEL_INFO"
   else
     echo -e "${CYAN}Status:${NC} ${RED}UNREACHABLE${NC}"
   fi
