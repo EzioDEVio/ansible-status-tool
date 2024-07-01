@@ -17,7 +17,6 @@ get_node_details() {
     memory=$(echo "$logo" | grep 'Memory:')
     ip=$(ansible -i $inventory_file -m setup -a 'filter=ansible_default_ipv4.address' $node 2>/dev/null | grep ansible_default_ipv4.address)
 
-    details+="$logo\n"
     details+="${GREEN}OS:${NC} $(echo $os | awk -F": " '{print $2}' | xargs)\n"
     details+="${GREEN}Host:${NC} $(echo $host | awk -F": " '{print $2}' | xargs)\n"
     details+="${GREEN}Kernel:${NC} $(echo $kernel | awk -F": " '{print $2}' | xargs)\n"
